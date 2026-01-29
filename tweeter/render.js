@@ -3,57 +3,54 @@ const Renderer = function () {
     const posts_elem = document.querySelector("#posts");
     posts_elem.innerHTML = "";
     posts.forEach((p) => {
-      const post = document.createElement("div");
+      const [post, post_text, delete_post] = postEL(p);
 
-      post.classList.add("post");
-
-      const post_text = document.createElement("div");
-      post_text.classList.add("post-text");
-      post_text.innerText = p.text;
-
-      const delete_post = document.createElement("button");
-      delete_post.classList.add("delete-post");
-      delete_post.id = p.id;
-      delete_post.innerText = "Delete Post";
-      const comments = document.createElement("div");
-      comments.classList.add("comments");
+      const comments = createEl("div", "comments");
       renderComments(p.id, comments, p.comments);
-      const div = document.createElement("div");
-      div.classList.add("row");
+      const div = createEl("div", "row");
+      const [comment_input, comment_btn] = commentEl(p);
 
-      const comment_input = document.createElement("input");
-      comment_input.classList.add("comment-input");
-      comment_input.id = p.id;
-      comment_input.placeholder = "Got something to say?";
-      const comment_btn = document.createElement("button");
-      comment_btn.classList.add("comment-button");
-      comment_btn.innerText = "Comment";
-      comment_btn.id = p.id;
       div.append(comment_input, comment_btn);
       post.append(post_text, comments, div, delete_post);
-
       posts_elem.appendChild(post);
     });
-
-    function renderComments(post_id, comments_elem, comments) {
-      comments.forEach((c) => {
-        const comment = document.createElement("div");
-        comment.classList.add("comment");
-        comment.id = c.id;
-        comment.innerText = c.text;
-        const delete_comment = document.createElement("div");
-        delete_comment.classList.add("delete-comment");
-        delete_comment.dataset.id1 = c.id;
-        delete_comment.dataset.id2 = post_id;
-
-        delete_comment.innerText = "X";
-        const div = document.createElement("div");
-        div.classList.add("row");
-        div.append(delete_comment, comment);
-        comments_elem.append(div);
-      });
-    }
   }
+  function createEl(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.classList.add(className);
+    if (text) el.innerText = text;
+    return el;
+  }
+  function postEL(p) {
+    const post = createEl("div", "post");
+    const post_text = createEl("div", "post-text", p.text);
+    const delete_post = createEl("button", "delete-post", "Delete Post");
+    delete_post.id = p.id;
+    return [post, post_text, delete_post];
+  }
+  function commentEl(p) {
+    const comment_input = createEl("input", "comment-input");
+    comment_input.id = p.id;
+    comment_input.placeholder = "Got something to say?";
+    const comment_btn = createEl("button", "comment-button", "Comment");
+    comment_btn.id = p.id;
+    return [comment_input, comment_btn];
+  }
+  function renderComments(post_id, comments_elem, comments) {
+    comments.forEach((c) => {
+      const comment = createEl("div", "comment", c.text);
+      comment.id = c.id;
+
+      const delete_comment = createEl("div", "delete-comment", "X");
+      delete_comment.dataset.id1 = c.id;
+      delete_comment.dataset.id2 = post_id;
+
+      const div = createEl("div", "row");
+      div.append(delete_comment, comment);
+      comments_elem.append(div);
+    });
+  }
+
   return { renderPosts };
 };
 export default Renderer;
